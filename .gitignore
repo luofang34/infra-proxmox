@@ -1,0 +1,10 @@
+# Local scratch
+*.tmp
+*.bak
+.DS_Store
+
+# Optional local overrides
+*.local.env
+
+# Logs
+*.log
