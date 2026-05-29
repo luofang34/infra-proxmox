@@ -64,6 +64,13 @@ STARTUP_ORDER=50                   # only used when ONBOOT=1
 DISPLAY_MODE=std                   # std (default) | serial — see "Boot and install"
 VM_DESCRIPTION="example VM"
 VM_TAGS="example,managed"
+
+# Optional InfiniBand SR-IOV VF passthrough (hostpci1). Set to a PVE
+# resource-mapping pool name to give the guest a real IB HCA — the only
+# way onto an IPoIB-only fabric (IPoIB is not bridgeable). The pool must
+# have a free VF or the VM fails to start. The guest configures the
+# fabric address/MTU/mode itself.
+IB_VF_MAPPING=mellanox-ib          # default unset (no IB passthrough)
 ```
 
 Inside the guest, the three data disks expose stable IDs based on the
