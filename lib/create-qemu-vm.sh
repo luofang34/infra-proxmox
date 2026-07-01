@@ -229,6 +229,18 @@ qm set "${VMID}" \
 qm set "${VMID}" \
   --net0 "virtio,bridge=${BRIDGE},firewall=1"
 
+# Optional InfiniBand SR-IOV VF passthrough. When IB_VF_MAPPING is set to a
+# PVE resource-mapping pool name (e.g. mellanox-ib), attach a VF from that
+# pool as a PCIe device so the guest gets a real IB HCA. This is the only
+# way onto an IPoIB-only fabric: IPoIB is not bridgeable, so a vmbr NIC
+# cannot reach it. Use the named mapping (never a raw 0000:xx:xx.x address)
+# so PVE picks a free VF at start; the pool must have a free VF or the VM
+# fails to start. The guest configures the fabric address/MTU/mode itself.
+if [[ -n "${IB_VF_MAPPING:-}" ]]; then
+  qm set "${VMID}" \
+    --hostpci1 "mapping=${IB_VF_MAPPING},pcie=1"
+fi
+
 qm set "${VMID}" \
   --boot "order=ide2;scsi0"
 
