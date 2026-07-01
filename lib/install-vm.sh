@@ -58,6 +58,10 @@ for var in VMID NAME; do
     exit 1
   fi
 done
+if ! [[ "${VMID}" =~ ^[0-9]+$ ]]; then
+  echo "ERROR: VMID must be numeric, got: ${VMID}" >&2
+  exit 1
+fi
 
 echo "==> ${NAME} (VMID ${VMID}): create on ${PVE_HOST}, install .#${FLAKE_ATTR} via ${BUILDER}"
 
@@ -131,8 +135,10 @@ ssh "${FWD_OPTS[@]}" "${BUILDER}" \
 # boot order, so the guest lands back in the installer; a hard stop is
 # safe there and the restart boots the installed system.
 echo "==> flipping boot order to disk and power-cycling"
+# ide2 may already be gone on a retried run; that must not stop the
+# power-cycle.
 ssh "${PVE_HOST}" \
-  "qm set ${VMID} --boot order=scsi0 && qm set ${VMID} --delete ide2 && \
+  "qm set ${VMID} --boot order=scsi0 && { qm set ${VMID} --delete ide2 || true; } && \
    qm stop ${VMID} --timeout 60 && qm start ${VMID}"
 
 if [[ -n "${STATIC_IP:-}" ]]; then
